@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hasil Kemiripan - Seberapa Mirip Kamu?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 40%, #a18cd1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 40px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .confetti {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .result-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .emoji-big {
+      font-size: 64px;
+      margin-bottom: 12px;
+      display: block;
+      animation: pop 0.6s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      70% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .percent {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e91e63, #9c27b0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 12px 0 4px;
+      line-height: 1;
+    }
+
+    .seleb-name {
+      font-size: 26px;
+      font-weight: 800;
+      color: #9c27b0;
+      margin-bottom: 16px;
+    }
+
+    .desc {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      padding: 0 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: linear-gradient(90deg, #e91e63, #9c27b0);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      background: linear-gradient(90deg, #e91e63, #9c27b0);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(233, 30, 99, 0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(233, 30, 99, 0.45);
+    }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #999;
+    }
+
+    /* Confetti pieces */
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: -20px;
+      opacity: 0;
+      animation: fall 3s ease-in forwards;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; top: -10%; transform: translateX(0) rotate(0deg); }
+      100% { opacity: 0; top: 110%; transform: translateX(var(--tx)) rotate(720deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="confetti" id="confetti"></div>
+      
+      <div class="result-content">
+        <span class="emoji-big" id="emoji">🎉</span>
+        <div class="badge">Hasil Analisis AI</div>
+        <h1>Kamu mirip banget sama</h1>
+        <div class="seleb-name" id="selebName">...</div>
+        <div class="percent" id="percent">0%</div>
+        <p class="desc" id="desc">Sedang menghitung...</p>
+        
+        <a href="index.html" class="btn">Coba Lagi 🔄</a>
+        
+        <p class="footer">Powered by FaceMatch AI • Hasil bersifat hiburan</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Daftar artis Indonesia
+    const selebList = [
+      { name: "Raisa", desc: "Aura elegan dan suaranya bikin merinding! Kamu punya vibe yang sama." },
+      { name: "Isyana Sarasvati", desc: "Energi kreatif dan unik banget. Wajahmu punya karakter kuat kayak dia!" },
+      { name: "Lyodra Ginting", desc: "Cantik natural + suara emas. Kemiripan wajahmu lumayan tinggi nih!" },
+      { name: "Tiara Andini", desc: "Sweet banget dan fresh. Kamu mirip versi yang lebih ceria darinya!" },
+      { name: "Mahalini", desc: "Aura soft & deep. Banyak yang bilang kamu mirip dia loh!" },
+      { name: "Aaliyah Massaid", desc: "Cantik mix + senyum manis. Level kemiripannya tinggi!" },
+      { name: "Fuji An", desc: "Fresh, natural, dan friendly banget. Kamu punya vibe yang sama!" },
+      { name: "Rebecca Klopper", desc: "Visual strong dan stylish. Wajahmu cocok banget di kategori ini!" },
+      { name: "Nagita Slavina", desc: "Aura keibuan + cantik natural. Banyak yang bilang mirip!" },
+      { name: "Ayu Ting Ting", desc: "Energi ceria dan ekspresif. Kamu punya facial expression mirip dia!" },
+      { name: "Lesti Kejora", desc: "Cantik Sunda banget. Proporsi wajahmu mirip level tinggi!" },
+      { name: "Salma Salsabil", desc: "Fresh generation + visual bagus. Kemiripan cukup mencolok!" },
+      { name: "Nadin Amizah", desc: "Aura artistic dan soft. Kamu punya vibe yang mirip banget." },
+      { name: "Bernadya", desc: "Cantik simple tapi berkesan. Wajahmu masuk kategori ini!" },
+      { name: "Agnez Mo", desc: "Iconic dan kuat. Ada sentuhan kemiripan yang menarik!" },
+      { name: "Rossa", desc: "Elegan dan timeless. Proporsi wajahmu mirip versi mudanya!" },
+      { name: "Bunga Citra Lestari", desc: "Aura hangat dan cantik. Banyak yang bilang mirip dia." },
+      { name: "Chelsea Islan", desc: "Cantik mix Indo + ekspresi natural. Level kemiripan tinggi!" },
+      { name: "Pevita Pearce", desc: "Visual strong dan memesona. Kamu punya facial structure mirip!" },
+      { name: "Prilly Latuconsina", desc: "Sweet & expressive. Banyak yang bilang wajahmu mirip dia!" },
+      { name: "Amanda Manopo", desc: "Cantik natural dan familiar. Kemiripannya lumayan banget!" },
+      { name: "Syahrini", desc: "Glamour + unique. Ada sentuhan kemiripan yang lucu!" },
+      { name: "Via Vallen", desc: "Energi dangdut modern. Ekspresi wajahmu mirip banget!" },
+      { name: "Happy Asmara", desc: "Fresh dan ramah. Kamu punya vibe yang sama!" }
+    ];
+
+    // Random pilih
+    const randomSeleb = selebList[Math.floor(Math.random() * selebList.length)];
+    const randomPercent = Math.floor(Math.random() * (96 - 74 + 1)) + 74; // 74-96%
+
+    // Tampilkan hasil
+    document.getElementById('selebName').textContent = randomSeleb.name;
+    document.getElementById('percent').textContent = randomPercent + '%';
+    document.getElementById('desc').textContent = randomSeleb.desc;
+
+    // Emoji sesuai persen
+    const emojiEl = document.getElementById('emoji');
+    if (randomPercent >= 90) emojiEl.textContent = '🔥';
+    else if (randomPercent >= 82) emojiEl.textContent = '😍';
+    else emojiEl.textContent = '✨';
+
+    // Confetti sederhana
+    const confettiContainer = document.getElementById('confetti');
+    const colors = ['#e91e63', '#9c27b0', '#ff9a9e', '#fecfef', '#a18cd1', '#ffd700'];
+    
+    for (let i = 0; i < 40; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
+      piece.style.animationDelay = (Math.random() * 2) + 's';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      confettiContainer.appendChild(piece);
+    }
+  </script>
+</body>
+</html>
